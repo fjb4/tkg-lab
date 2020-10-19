@@ -1,0 +1,6 @@
+provider: aws
+aws:
+  credentials:
+    secretKey: <REDACTED>
+    accessKey: ASIAXHAVKZ6ZGPU2F5XU
+  region: us-east-2

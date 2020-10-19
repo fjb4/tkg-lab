@@ -1,0 +1,19 @@
+global:
+  hosts:
+    domain: tkg.jb-cloud.com
+    https: true
+    gitlab:
+      name: gitlab.tkg.jb-cloud.com
+      https: true
+    registry:
+      name: registry.tkg.jb-cloud.com
+      https: true
+    minio:
+      name: minio.tkg.jb-cloud.com
+      https: true
+  ingress:
+    enabled: true
+    configureCertmanager: false
+    class: contour
+    tls:
+      secretName: gitlab-cert-tls
