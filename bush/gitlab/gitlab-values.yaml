@@ -1,4 +1,5 @@
 global:
+  edition: ce
   hosts:
     domain: tkg.jb-cloud.com
     https: true

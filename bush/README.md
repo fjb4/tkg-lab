@@ -8,9 +8,9 @@ kubectl konfig import --save <filename>
 kubectl create clusterrolebinding privileged-role-binding --clusterrole=vmware-system-tmc-psp-privileged --group=system:authenticated
 
 Install metrics-server
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+kapp deploy -a metrics-server -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
 
-kapp deploy -a cert-manager -n tanzu-kapp -f tkg-extensions/cert-manager/
+kapp deploy -a cert-manager -f tkg-extensions/cert-manager/
 
 kapp deploy -a contour -n tanzu-kapp -f tkg-extensions/ingress/contour/aws
 kubectl get pod,svc -n tanzu-system-ingress
@@ -44,6 +44,8 @@ kubectl apply -f gitlab-certs.yaml
 
 helm install gitlab gitlab/gitlab -n gitlab --timeout 600s -f ./gitlab-values.yaml
 
+kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode ; echo
+
 ### Retrieve API token
 kubectl get secret -n kubeapps $(kubectl get serviceaccount kubeapps-operator -n kubeapps -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep kubeapps-operator-token) -o jsonpath='{.data.token}' -o go-template='{{.data.token | base64decode}}' && echo
 
@@ -58,17 +60,13 @@ tmc cluster provisionedcluster kubeconfig get bush-tas-1
 
 kubectl create clusterrolebinding privileged-role-binding --clusterrole=vmware-system-tmc-psp-privileged --group=system:authenticated
 
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+kapp deploy -a metrics-server -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+
+kapp deploy -a cert-manager -f tkg-extensions/cert-manager/
 
 Install Tanzu Postgres
 http://postgres-kubernetes.docs.pivotal.io/0-4/installing.html
 https://network.pivotal.io/products/pivotal-postgres-for-kubernetes/
-
-
-
-
-
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.0/cert-manager.yaml
 
 pivnet download-product-files --product-slug='pivotal-postgres-for-kubernetes' --release-version='1.0.0-c1' --product-file-id=806931
 
@@ -89,8 +87,6 @@ kubectl create secret docker-registry regsecret \
     --docker-username=admin \
     --docker-password="Pass@word1"
 
-helm install postgres-operator operator/
-
 helm install postgres-operator -f operator/values-overrides.yaml operator/
 
 kubectl create -f pg-small-instance.yaml
@@ -101,3 +97,4 @@ https://network.pivotal.io/products/tas-for-kubernetes#/releases/759070
 
 pivnet download-product-files --product-slug='pivotal-postgres-for-kubernetes' --release-version='1.0.0-c1' --product-file-id=806931
 
+kubectl apply -f postgres-databases.yml
